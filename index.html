@@ -19,6 +19,13 @@
     svg { display: block; width: 100vw; height: 100vh; }
     h1 { display: none; font-size: clamp(2.5rem, 8vw, 8rem); margin: 0; text-align: center; }
 
+    /* Subtle perf hint for pointer-tilt */
+    svg { will-change: transform; }
+    #tiltLayer { transform-box: fill-box; transform-origin: 50% 50%; will-change: transform; }
+
+    /* Soft twinkle for stars */
+    @keyframes twinkle { from { opacity: 0.12; } to { opacity: 0.32; } }
+
     @media (prefers-reduced-motion: reduce) {
       svg { display: none; }
       body { display: grid; place-items: center; }
@@ -28,27 +35,84 @@
 </head>
 <body>
   <svg id="scene" viewBox="0 0 1000 1000" aria-hidden="true" role="img">
-    <rect x="0" y="0" width="1000" height="1000" fill="#000" />
-    <path id="circlePath" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <defs>
+      <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="#030712"/>
+        <stop offset="60%" stop-color="#01030a"/>
+        <stop offset="100%" stop-color="#000"/>
+      </radialGradient>
+      <linearGradient id="strokeGrad" x1="0" y1="0" x2="1000" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#7dd3fc"/>
+        <stop offset="50%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#a78bfa"/>
+      </linearGradient>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2" result="b1"/>
+        <feMerge>
+          <feMergeNode in="b1"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id="noise" x="-50%" y="-50%" width="200%" height="200%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/>
+        <feColorMatrix type="saturate" values="0"/>
+        <feComponentTransfer>
+          <feFuncA type="table" tableValues="0 0.06"/>
+        </feComponentTransfer>
+      </filter>
+    </defs>
+
+    <g id="tiltLayer">
+      <rect x="0" y="0" width="1000" height="1000" fill="url(#bgGrad)" />
+
+      <!-- Soft starfield -->
+      <g id="stars" opacity="0.8"></g>
+
+      <!-- Echo ring under main groove -->
+      <path id="echoPath" fill="none" stroke="url(#strokeGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.22" shape-rendering="geometricPrecision" vector-effect="non-scaling-stroke"/>
+
+      <path id="circlePath" fill="none" stroke="url(#strokeGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" shape-rendering="geometricPrecision" vector-effect="non-scaling-stroke"/>
+    </g>
+
+    <text id="brandText" x="500" y="500" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="70" font-weight="700" letter-spacing="0.03em" style="pointer-events:none;" filter="url(#glow)">Epiblast AI</text>
+
+    <!-- Film grain overlay -->
+    <rect x="0" y="0" width="1000" height="1000" filter="url(#noise)" opacity="0.06"/>
   </svg>
   <h1>Epiblast AI</h1>
 
   <script>
-    const svg = document.getElementById('scene');
+    const scene = document.getElementById('scene');
+    const tiltLayer = document.getElementById('tiltLayer');
     const path = document.getElementById('circlePath');
+    const echo = document.getElementById('echoPath');
+    const brandText = document.getElementById('brandText');
+    const starsGroup = document.getElementById('stars');
+    const strokeGrad = document.getElementById('strokeGrad');
 
     const cx = 500;
     const cy = 500;
     const baseRadius = 350;
-    const sigma = 0.6; // Deformation spread around the bottom
-    const sampleCount = 240; // More points -> smoother curve
+
+    // Shape profile (sharper groove)
+    const grooveCenterAngle = 1.5 * Math.PI; // bottom
+    const grooveSigma = 0.2;                // wider angular width
+    const sharpnessPower = 8;               // super-Gaussian exponent
+
+    const sampleCount = 360;
     const twoPi = Math.PI * 2;
 
-    // Elastic motion parameters
-    const initialAmplitude = 90;    // Max inward indentation in px
-    const angularFrequency = 2.2;   // rad/s
-    const damping = 1.2;            // per second
-    const restartThreshold = 2;     // px
+    // Motion (continuous, no reset)
+    const baseAmplitude = 240;   // px toward center at groove apex
+    const angularFrequency = 1.05;  // rad/s
+    const envelopeFrequency = 0.18; // slow variation of amplitude
+
+    // Stars
+    const starCount = 80;
+
+    // Tilt smoothing
+    let targetDeg = 0;
+    let currentDeg = 0;
 
     function angleDifference(a, b) {
       let d = a - b;
@@ -56,44 +120,101 @@
       return d;
     }
 
-    function gaussian(delta) {
-      return Math.exp(-(delta * delta) / (2 * sigma * sigma));
+    function superGaussian(delta) {
+      const x = Math.abs(delta) / grooveSigma;
+      return Math.exp(-Math.pow(x, sharpnessPower));
     }
 
     function buildPath(indentation) {
       let d = '';
       for (let i = 0; i < sampleCount; i++) {
         const theta = (i / sampleCount) * twoPi;
-        const g = gaussian(angleDifference(theta, Math.PI)); // peak at bottom
-        // Allow a subtle outward overshoot on rebound (30% of inward magnitude)
-        const effectiveIndent = indentation > 0 ? indentation : 0.35 * indentation;
+        const g = superGaussian(angleDifference(theta, grooveCenterAngle));
+        const effectiveIndent = indentation > 0 ? indentation : 0.2 * indentation;
         const r = baseRadius - effectiveIndent * g;
         const x = cx + r * Math.cos(theta);
         const y = cy + r * Math.sin(theta);
-        d += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
+        d += (i === 0 ? 'M' : 'L') + x + ' ' + y + ' ';
       }
       d += 'Z';
       return d;
     }
 
+    function createStars() {
+      if (!starsGroup) return;
+      // Clear existing
+      while (starsGroup.firstChild) starsGroup.removeChild(starsGroup.firstChild);
+      for (let i = 0; i < starCount; i++) {
+        const s = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const x = Math.random() * 1000;
+        const y = Math.random() * 1000;
+        const r = 0.5 + Math.random() * 1.2;
+        const d = 2.5 + Math.random() * 3.5; // duration
+        const delay = Math.random() * 4;
+        const o0 = (0.08 + Math.random() * 0.12).toFixed(2);
+        const o1 = (0.22 + Math.random() * 0.18).toFixed(2);
+        s.setAttribute('cx', x.toFixed(1));
+        s.setAttribute('cy', y.toFixed(1));
+        s.setAttribute('r', r.toFixed(2));
+        s.setAttribute('fill', '#fff');
+        s.setAttribute('opacity', o0);
+        s.setAttribute('style', `--o0:${o0};--o1:${o1};animation:twinkle ${d.toFixed(2)}s ease-in-out ${delay.toFixed(2)}s infinite alternate`);
+        starsGroup.appendChild(s);
+      }
+    }
+
     let startTime = null;
     function animate(ts) {
       if (startTime === null) startTime = ts;
-      const t = (ts - startTime) / 1000; // seconds
-      const amplitude = initialAmplitude * Math.exp(-damping * t);
-      const indentation = amplitude * Math.sin(angularFrequency * t);
+      const t = (ts - startTime) / 1000;
 
+      // Continuous oscillation with slow envelope
+      const envelope = 0.85 + 0.15 * Math.sin(envelopeFrequency * t);
+      const indentation = baseAmplitude * envelope * Math.sin(angularFrequency * t);
+
+      // Groove paths
       path.setAttribute('d', buildPath(indentation));
+      if (echo) echo.setAttribute('d', buildPath(indentation * 0.6));
 
-      if (amplitude < restartThreshold) {
-        startTime = ts; // restart the pulse
+      // Rotate stroke gradient around scene center
+      if (strokeGrad) {
+        const angle = (t * 8) % 360;
+        strokeGrad.setAttribute('gradientTransform', `rotate(${angle}, 500, 500)`);
       }
+
+      // Gentle breathing of the brand text
+      if (brandText) {
+        const s = 1 + 0.003 * Math.sin(t * 1.4);
+        brandText.setAttribute('transform', `translate(500 500) scale(${s}) translate(-500 -500)`);
+      }
+
+      // Slow drift of starfield
+      if (starsGroup) {
+        const a = t * 0.6;
+        starsGroup.setAttribute('transform', `rotate(${a}, 500, 500)`);
+      }
+
+      // Apply smoothed pointer tilt only to tilt layer (not text)
+      if (tiltLayer) {
+        currentDeg += (targetDeg - currentDeg) * 0.08;
+        tiltLayer.style.transform = `rotate(${currentDeg}deg)`;
+      }
+
       requestAnimationFrame(animate);
     }
 
-    // Respect reduced motion preference
+    // Pointer tilt (very subtle) with deadzone
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mediaQuery.matches) {
+      createStars();
+      window.addEventListener('pointermove', (e) => {
+        const rect = scene.getBoundingClientRect();
+        const dx = (e.clientX - rect.left) / rect.width - 0.5;
+        const deadzone = 0.015;
+        const clampedDx = Math.abs(dx) < deadzone ? 0 : dx;
+        const deg = clampedDx * 2; // tiny tilt
+        targetDeg = deg;
+      }, { passive: true });
       requestAnimationFrame(animate);
     }
   </script>
