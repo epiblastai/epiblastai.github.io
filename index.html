@@ -13,22 +13,92 @@
       margin: 0;
       background: #000;
       color: #fff;
-      display: grid;
-      place-items: center;
+      overflow: hidden;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
     }
-    h1 {
-      font-size: clamp(2.5rem, 8vw, 8rem);
-      letter-spacing: 0.02em;
-      margin: 0;
-      font-weight: 700;
-      text-align: center;
+    svg { display: block; width: 100vw; height: 100vh; }
+    h1 { display: none; font-size: clamp(2.5rem, 8vw, 8rem); margin: 0; text-align: center; }
+
+    @media (prefers-reduced-motion: reduce) {
+      svg { display: none; }
+      body { display: grid; place-items: center; }
+      h1 { display: block; }
     }
-    .fade-in { opacity: 0; animation: fade 0.8s ease forwards; }
-    @keyframes fade { to { opacity: 1; } }
   </style>
 </head>
 <body>
-  <h1 class="fade-in">Epiblast AI</h1>
+  <svg id="scene" viewBox="0 0 1000 1000" aria-hidden="true" role="img">
+    <rect x="0" y="0" width="1000" height="1000" fill="#000" />
+    <path id="circlePath" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h1>Epiblast AI</h1>
+
+  <script>
+    const svg = document.getElementById('scene');
+    const path = document.getElementById('circlePath');
+
+    const cx = 500;
+    const cy = 500;
+    const baseRadius = 350;
+    const sigma = 0.6; // Deformation spread around the bottom
+    const sampleCount = 240; // More points -> smoother curve
+    const twoPi = Math.PI * 2;
+
+    // Elastic motion parameters
+    const initialAmplitude = 90;    // Max inward indentation in px
+    const angularFrequency = 2.2;   // rad/s
+    const damping = 1.2;            // per second
+    const restartThreshold = 2;     // px
+
+    function angleDifference(a, b) {
+      let d = a - b;
+      d = (d + Math.PI) % (2 * Math.PI) - Math.PI;
+      return d;
+    }
+
+    function gaussian(delta) {
+      return Math.exp(-(delta * delta) / (2 * sigma * sigma));
+    }
+
+    function buildPath(indentation) {
+      let d = '';
+      for (let i = 0; i < sampleCount; i++) {
+        const theta = (i / sampleCount) * twoPi;
+        const g = gaussian(angleDifference(theta, Math.PI)); // peak at bottom
+        // Allow a subtle outward overshoot on rebound (30% of inward magnitude)
+        const effectiveIndent = indentation > 0 ? indentation : 0.35 * indentation;
+        const r = baseRadius - effectiveIndent * g;
+        const x = cx + r * Math.cos(theta);
+        const y = cy + r * Math.sin(theta);
+        d += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
+      }
+      d += 'Z';
+      return d;
+    }
+
+    let startTime = null;
+    function animate(ts) {
+      if (startTime === null) startTime = ts;
+      const t = (ts - startTime) / 1000; // seconds
+      const amplitude = initialAmplitude * Math.exp(-damping * t);
+      const indentation = amplitude * Math.sin(angularFrequency * t);
+
+      path.setAttribute('d', buildPath(indentation));
+
+      if (amplitude < restartThreshold) {
+        startTime = ts; // restart the pulse
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // Respect reduced motion preference
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!mediaQuery.matches) {
+      requestAnimationFrame(animate);
+    }
+  </script>
+  <noscript>
+    Epiblast AI
+  </noscript>
 </body>
 </html> 
