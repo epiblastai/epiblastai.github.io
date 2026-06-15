@@ -3,438 +3,153 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Epiblast AI</title>
-  <meta name="description" content="Epiblast AI">
+  <title>Epiblast</title>
+  <meta name="description" content="Developing machine learning optimized for predictive validity in translational drug discovery.">
+  <link rel="icon" href="favicon.png" type="image/png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: #050a18;
-      color: #fff;
-      overflow: hidden;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+    :root {
+      color-scheme: light;
+      --black: #000;
+      --bg: #FDFDFD;
+      --gray: #555;
+      --border: 2px solid var(--black);
     }
-    svg { display: block; width: 100vw; height: 100vh; }
-    h1 { display: none; font-size: clamp(2.5rem, 8vw, 8rem); margin: 0; text-align: center; }
 
-    svg { will-change: transform; }
-    #tiltLayer { transform-box: fill-box; transform-origin: 50% 50%; will-change: transform; }
+    * { box-sizing: border-box; }
 
-    @media (prefers-reduced-motion: reduce) {
-      svg { display: none; }
-      body { display: grid; place-items: center; }
-      h1 { display: block; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--black);
+      font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 3rem 1.5rem 4rem;
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+    }
+
+    .logo {
+      display: block;
+      width: min(100%, 28rem);
+      height: auto;
+      margin-bottom: 1.75rem;
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      font-size: clamp(2.75rem, 7vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+    }
+
+    .tagline {
+      margin: 0 0 3rem;
+      max-width: 36rem;
+      font-size: clamp(0.95rem, 2.2vw, 1.125rem);
+      font-weight: 400;
+      line-height: 1.55;
+      color: var(--gray);
+      letter-spacing: 0.01em;
+    }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      width: 100%;
+    }
+
+    @media (max-width: 40rem) {
+      .tiles {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tile {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      min-height: 9rem;
+      padding: 1.5rem 1.35rem;
+      border: var(--border);
+      background: var(--bg);
+      color: var(--black);
+      text-decoration: none;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .tile:hover,
+    .tile:focus-visible {
+      background: var(--black);
+      color: var(--bg);
+      outline: none;
+    }
+
+    .tile-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-transform: lowercase;
+    }
+
+    .tile-desc {
+      margin: 0;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+      opacity: 0.72;
+    }
+
+    .tile:hover .tile-desc,
+    .tile:focus-visible .tile-desc {
+      opacity: 0.88;
     }
   </style>
 </head>
 <body>
-  <svg id="scene" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" role="img">
-    <defs>
-      <!-- Background gradient -->
-      <radialGradient id="bgGrad" cx="50%" cy="48%" r="72%">
-        <stop offset="0%" stop-color="#0f1d3a"/>
-        <stop offset="35%" stop-color="#0a1428"/>
-        <stop offset="65%" stop-color="#060b1a"/>
-        <stop offset="100%" stop-color="#020308"/>
-      </radialGradient>
+  <main>
+    <div class="brand">
+      <img class="logo" src="froglet_wide.png" alt="Epiblast froglet illustration">
+      <h1>Epiblast</h1>
+      <p class="tagline">Developing machine learning optimized for predictive validity in translational drug discovery.</p>
+    </div>
 
-      <!-- Ectoderm (teal/cyan) -->
-      <linearGradient id="ectoStroke" x1="0" y1="0" x2="1000" y2="1000" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#67e8f9"/>
-        <stop offset="40%" stop-color="#7dd3fc"/>
-        <stop offset="70%" stop-color="#a5f3fc"/>
-        <stop offset="100%" stop-color="#c4b5fd"/>
-      </linearGradient>
-      <radialGradient id="ectoFill" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.06"/>
-        <stop offset="60%" stop-color="#7dd3fc" stop-opacity="0.04"/>
-        <stop offset="100%" stop-color="#a5b4fc" stop-opacity="0.01"/>
-      </radialGradient>
-
-      <!-- Mesoderm (blue-lavender) -->
-      <linearGradient id="mesoStroke" x1="0" y1="0" x2="1000" y2="1000" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#93c5fd"/>
-        <stop offset="50%" stop-color="#c7d2fe"/>
-        <stop offset="100%" stop-color="#ddd6fe"/>
-      </linearGradient>
-      <radialGradient id="mesoFill" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.05"/>
-        <stop offset="60%" stop-color="#c7d2fe" stop-opacity="0.035"/>
-        <stop offset="100%" stop-color="#ddd6fe" stop-opacity="0.01"/>
-      </radialGradient>
-
-      <!-- Endoderm (purple/violet) -->
-      <linearGradient id="endoStroke" x1="0" y1="0" x2="1000" y2="1000" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#818cf8"/>
-        <stop offset="50%" stop-color="#a78bfa"/>
-        <stop offset="100%" stop-color="#c084fc"/>
-      </linearGradient>
-      <radialGradient id="endoFill" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#818cf8" stop-opacity="0.06"/>
-        <stop offset="60%" stop-color="#a78bfa" stop-opacity="0.04"/>
-        <stop offset="100%" stop-color="#c084fc" stop-opacity="0.015"/>
-      </radialGradient>
-
-      <!-- Glow filters -->
-      <filter id="glowTight" x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur stdDeviation="3" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <filter id="glowSoft" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="8"/>
-      </filter>
-      <filter id="glowWide" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="18"/>
-      </filter>
-
-      <!-- Layer bloom (combined sharp + soft) -->
-      <filter id="layerGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="soft"/>
-        <feComposite in="SourceGraphic" in2="soft" operator="over"/>
-      </filter>
-
-      <!-- Morphogen blur -->
-      <filter id="morphBlur" x="-120%" y="-120%" width="340%" height="340%">
-        <feGaussianBlur stdDeviation="90"/>
-      </filter>
-
-      <!-- Film grain -->
-      <filter id="noise" x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
-        <feColorMatrix type="saturate" values="0"/>
-        <feComponentTransfer>
-          <feFuncA type="table" tableValues="0 0.05"/>
-        </feComponentTransfer>
-      </filter>
-    </defs>
-
-    <g id="tiltLayer">
-      <!-- Background fills beyond viewBox for slice coverage -->
-      <rect x="-200" y="-200" width="1400" height="1400" fill="url(#bgGrad)"/>
-
-      <!-- Morphogen atmosphere -->
-      <g id="morphogens">
-        <circle id="morph0" cx="320" cy="320" r="280" fill="#22d3ee" opacity="0.12" filter="url(#morphBlur)"/>
-        <circle id="morph1" cx="680" cy="380" r="250" fill="#6366f1" opacity="0.10" filter="url(#morphBlur)"/>
-        <circle id="morph2" cx="500" cy="700" r="240" fill="#a78bfa" opacity="0.09" filter="url(#morphBlur)"/>
-      </g>
-
-      <!-- Dividing cell particles -->
-      <g id="cellsLayer"></g>
-
-      <!-- Germ layers: endoderm (inner) → mesoderm → ectoderm (outer) -->
-      <g id="endodermGroup">
-        <path id="endoFillPath" fill="url(#endoFill)" stroke="none"/>
-        <path id="endoEchoPath" fill="none" stroke="url(#endoStroke)" stroke-width="8" opacity="0.12" shape-rendering="geometricPrecision"/>
-        <path id="endoStrokePath" fill="none" stroke="url(#endoStroke)" stroke-width="1.8" opacity="0.55" stroke-linecap="round" stroke-linejoin="round" filter="url(#glowTight)" shape-rendering="geometricPrecision"/>
-      </g>
-      <g id="mesodermGroup">
-        <path id="mesoFillPath" fill="url(#mesoFill)" stroke="none"/>
-        <path id="mesoEchoPath" fill="none" stroke="url(#mesoStroke)" stroke-width="10" opacity="0.10" shape-rendering="geometricPrecision"/>
-        <path id="mesoStrokePath" fill="none" stroke="url(#mesoStroke)" stroke-width="1.8" opacity="0.65" stroke-linecap="round" stroke-linejoin="round" filter="url(#glowTight)" shape-rendering="geometricPrecision"/>
-      </g>
-      <g id="ectodermGroup">
-        <path id="ectoFillPath" fill="url(#ectoFill)" stroke="none"/>
-        <path id="ectoEchoPath" fill="none" stroke="url(#ectoStroke)" stroke-width="14" opacity="0.08" shape-rendering="geometricPrecision"/>
-        <path id="ectoStrokePath" fill="none" stroke="url(#ectoStroke)" stroke-width="2.2" opacity="0.9" stroke-linecap="round" stroke-linejoin="round" filter="url(#layerGlow)" shape-rendering="geometricPrecision"/>
-      </g>
-    </g>
-
-    <!-- Multi-layer text glow -->
-    <text id="textGlowWide" x="500" y="500" text-anchor="middle" dominant-baseline="middle" fill="#22d3ee" font-size="100" font-weight="700" letter-spacing="0.03em" style="pointer-events:none;" filter="url(#glowWide)" opacity="0.15">Epiblast AI</text>
-    <text id="textGlowMed" x="500" y="500" text-anchor="middle" dominant-baseline="middle" fill="#c4b5fd" font-size="100" font-weight="700" letter-spacing="0.03em" style="pointer-events:none;" filter="url(#glowSoft)" opacity="0.30">Epiblast AI</text>
-    <text id="brandText" x="500" y="500" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="100" font-weight="700" letter-spacing="0.03em" style="pointer-events:none;" filter="url(#glowTight)">Epiblast AI</text>
-
-    <!-- Film grain overlay -->
-    <rect x="-200" y="-200" width="1400" height="1400" filter="url(#noise)" opacity="0.06" style="pointer-events:none;"/>
-  </svg>
-  <h1>Epiblast AI</h1>
-
-  <script>
-    const scene = document.getElementById('scene');
-    const tiltLayer = document.getElementById('tiltLayer');
-    const brandText = document.getElementById('brandText');
-    const textGlowWide = document.getElementById('textGlowWide');
-    const textGlowMed = document.getElementById('textGlowMed');
-    const cellsLayer = document.getElementById('cellsLayer');
-
-    const morphEls = [
-      document.getElementById('morph0'),
-      document.getElementById('morph1'),
-      document.getElementById('morph2')
-    ];
-
-    const ectoStrokeGrad = document.getElementById('ectoStroke');
-    const mesoStrokeGrad = document.getElementById('mesoStroke');
-    const endoStrokeGrad = document.getElementById('endoStroke');
-
-    // Layer config
-    const layerDefs = [
-      { radius: 320, phaseOff: 0,    noiseAmp: 12, noiseSeed: 0,  fillEl: 'ectoFillPath', echoEl: 'ectoEchoPath', strokeEl: 'ectoStrokePath' },
-      { radius: 245, phaseOff: 0.4,  noiseAmp: 9,  noiseSeed: 17, fillEl: 'mesoFillPath', echoEl: 'mesoEchoPath', strokeEl: 'mesoStrokePath' },
-      { radius: 165, phaseOff: 0.8,  noiseAmp: 7,  noiseSeed: 37, fillEl: 'endoFillPath', echoEl: 'endoEchoPath', strokeEl: 'endoStrokePath' }
-    ];
-    const layers = layerDefs.map(l => ({
-      ...l,
-      fill: document.getElementById(l.fillEl),
-      echo: document.getElementById(l.echoEl),
-      stroke: document.getElementById(l.strokeEl)
-    }));
-
-    const CX = 500, CY = 500;
-    const TWO_PI = Math.PI * 2;
-    const SAMPLES = 180;
-    const PHI = 1.618033988749895;
-
-    // Breathing
-    const BREATHE_FREQ = 0.35; // slow pulse
-    const BREATHE_AMP = 8;     // px radius variation
-
-    // Tilt
-    let targetTilt = 0, currentTilt = 0;
-
-    // --- Harmonic noise: sum-of-sines at odd frequencies ---
-    function hNoise(theta, t, amp, seed) {
-      const F = [3, 5, 7, 9, 11];
-      let v = 0;
-      for (let i = 0; i < 5; i++) {
-        const ph = seed + i * PHI * 2.4;
-        const tPh = t * (0.4 + i * 0.15);
-        v += Math.sin(F[i] * theta + ph + tPh) / F[i];
-      }
-      return v * amp;
-    }
-
-    // Build a closed SVG path for one layer (organic breathing circle)
-    function buildPath(layer, t) {
-      let d = '';
-      const breathe = BREATHE_AMP * Math.sin(BREATHE_FREQ * t + layer.noiseSeed * 0.1);
-      for (let i = 0; i < SAMPLES; i++) {
-        const theta = (i / SAMPLES) * TWO_PI;
-        const n = hNoise(theta, t, layer.noiseAmp, layer.noiseSeed);
-        const r = layer.radius + breathe + n;
-        const px = (CX + r * Math.cos(theta)).toFixed(1);
-        const py = (CY + r * Math.sin(theta)).toFixed(1);
-        d += (i === 0 ? 'M' : 'L') + px + ' ' + py + ' ';
-      }
-      return d + 'Z';
-    }
-
-    // --- Cell particle system ---
-    const cells = [];
-    const MAX_CELLS = 24;
-    const CELL_COLORS = ['#67e8f9','#7dd3fc','#a5f3fc','#93c5fd','#c7d2fe','#a5b4fc','#818cf8','#a78bfa','#c084fc'];
-    let cellId = 0;
-    const NS = 'http://www.w3.org/2000/svg';
-
-    function spawnCell(x, y, r) {
-      if (cells.length >= MAX_CELLS) return null;
-      const c = {
-        id: cellId++,
-        x: x ?? (80 + Math.random() * 840),
-        y: y ?? (80 + Math.random() * 840),
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: r ?? (4 + Math.random() * 6),
-        color: CELL_COLORS[(cellId) % CELL_COLORS.length],
-        state: 'live', age: 0,
-        divAt: 10 + Math.random() * 18,
-        divP: 0, op: 0.3,
-        el: null, el2: null, g: null
-      };
-      c.g = document.createElementNS(NS, 'g');
-      c.el = document.createElementNS(NS, 'ellipse');
-      c.el.setAttribute('fill', c.color);
-      c.g.appendChild(c.el);
-      cellsLayer.appendChild(c.g);
-      cells.push(c);
-      return c;
-    }
-
-    function killCell(c) {
-      if (c.g?.parentNode) c.g.parentNode.removeChild(c.g);
-      const i = cells.indexOf(c);
-      if (i >= 0) cells.splice(i, 1);
-    }
-
-    // Initial population
-    for (let i = 0; i < 16; i++) {
-      const c = spawnCell();
-      if (c) c.age = Math.random() * c.divAt * 0.6;
-    }
-
-    function tickCells(dt) {
-      for (let i = cells.length - 1; i >= 0; i--) {
-        const c = cells[i];
-        c.age += dt;
-
-        // Drift
-        c.x += c.vx; c.y += c.vy;
-        if (c.x < -30) c.x = 1030; if (c.x > 1030) c.x = -30;
-        if (c.y < -30) c.y = 1030; if (c.y > 1030) c.y = -30;
-
-        if (c.state === 'live') {
-          // Try to divide when ready (only if room)
-          if (c.age >= c.divAt && cells.length < MAX_CELLS - 1) {
-            c.state = 'div'; c.divP = 0;
-            c.el2 = document.createElementNS(NS, 'ellipse');
-            c.el2.setAttribute('fill', c.color);
-            c.g.appendChild(c.el2);
-          } else if (c.age >= c.divAt) {
-            // At capacity — just reschedule division for later
-            c.age = 0;
-            c.divAt = 6 + Math.random() * 10;
-          }
-          setEllipse(c.el, c.x, c.y, c.r, c.r, c.op);
-        } else {
-          // Division animation (3 seconds)
-          c.divP += dt / 3;
-          const p = Math.min(1, c.divP);
-
-          // Rotation angle for division axis (random per cell, seeded by id)
-          const divAngle = (c.id * PHI) % TWO_PI;
-          const cosA = Math.cos(divAngle), sinA = Math.sin(divAngle);
-
-          if (p < 0.3) {
-            // Elongate along division axis
-            const e = p / 0.3;
-            const rx = c.r * (1 + e * 0.6);
-            const ry = c.r * (1 - e * 0.12);
-            setEllipse(c.el, c.x, c.y, rx, ry, c.op);
-            // Rotate the ellipse to align with division axis
-            c.el.setAttribute('transform', `rotate(${divAngle * 180 / Math.PI} ${c.x.toFixed(1)} ${c.y.toFixed(1)})`);
-            if (c.el2) c.el2.setAttribute('opacity', '0');
-          } else if (p < 0.7) {
-            // Pinch: two cells separating
-            const pinch = (p - 0.3) / 0.4;
-            const sep = c.r * 1.2 * pinch;
-            const rx = c.r * 0.82, ry = c.r * (1 - pinch * 0.2);
-            setEllipse(c.el, c.x - cosA * sep, c.y - sinA * sep, rx, ry, c.op);
-            setEllipse(c.el2, c.x + cosA * sep, c.y + sinA * sep, rx, ry, c.op);
-            c.el.setAttribute('transform', `rotate(${divAngle * 180 / Math.PI} ${(c.x - cosA * sep).toFixed(1)} ${(c.y - sinA * sep).toFixed(1)})`);
-            c.el2.setAttribute('transform', `rotate(${divAngle * 180 / Math.PI} ${(c.x + cosA * sep).toFixed(1)} ${(c.y + sinA * sep).toFixed(1)})`);
-          } else {
-            // Fully separate
-            const sep = c.r * 1.2 + ((p - 0.7) / 0.3) * c.r * 1.8;
-            const dr = c.r * 0.88;
-            setEllipse(c.el, c.x - cosA * sep, c.y - sinA * sep, dr, dr, c.op);
-            setEllipse(c.el2, c.x + cosA * sep, c.y + sinA * sep, dr, dr, c.op);
-            c.el.removeAttribute('transform');
-            if (c.el2) c.el2.removeAttribute('transform');
-
-            if (p >= 1) {
-              // Division complete: spawn daughter, reset parent
-              const offX = cosA * c.r * 3, offY = sinA * c.r * 3;
-              const dr2 = c.r * (0.85 + Math.random() * 0.15);
-              const daughter = spawnCell(c.x + offX, c.y + offY, dr2);
-              if (daughter) {
-                daughter.vx = c.vx + cosA * 0.15 + (Math.random() - 0.5) * 0.1;
-                daughter.vy = c.vy + sinA * 0.15 + (Math.random() - 0.5) * 0.1;
-              }
-              // Clean up parent's second ellipse
-              if (c.el2?.parentNode) c.el2.parentNode.removeChild(c.el2);
-              c.el2 = null;
-              c.el.removeAttribute('transform');
-              // Parent lives on — just reset division timer
-              c.state = 'live';
-              c.age = 0;
-              c.divAt = 10 + Math.random() * 18;
-              // Nudge parent in opposite direction
-              c.vx += -cosA * 0.1;
-              c.vy += -sinA * 0.1;
-            }
-          }
-        }
-        c.g.setAttribute('opacity', c.op.toFixed(3));
-      }
-    }
-
-    function setEllipse(el, cx, cy, rx, ry, op) {
-      if (!el) return;
-      el.setAttribute('cx', cx.toFixed(1));
-      el.setAttribute('cy', cy.toFixed(1));
-      el.setAttribute('rx', Math.max(0.5, rx).toFixed(1));
-      el.setAttribute('ry', Math.max(0.5, ry).toFixed(1));
-      el.setAttribute('opacity', op.toFixed(3));
-    }
-
-    // --- Morphogen orbit ---
-    const MORPH = [
-      { bx: 320, by: 320, or: 140, sp: 0.07, ph: 0 },
-      { bx: 680, by: 380, or: 120, sp: 0.05, ph: 2.1 },
-      { bx: 500, by: 700, or: 110, sp: 0.06, ph: 4.2 }
-    ];
-
-    function tickMorphogens(t) {
-      for (let i = 0; i < 3; i++) {
-        const m = MORPH[i];
-        const a = m.sp * t + m.ph;
-        morphEls[i].setAttribute('cx', (m.bx + Math.cos(a) * m.or).toFixed(1));
-        morphEls[i].setAttribute('cy', (m.by + Math.sin(a) * m.or).toFixed(1));
-      }
-    }
-
-    // --- Main loop ---
-    let t0 = null, prevTs = 0;
-
-    function animate(ts) {
-      if (t0 === null) { t0 = ts; prevTs = ts; }
-      const t = (ts - t0) / 1000;
-      const dt = Math.min((ts - prevTs) / 1000, 0.05);
-      prevTs = ts;
-
-      // Germ layers (organic breathing, no groove)
-      for (const L of layers) {
-        const d = buildPath(L, t);
-        L.stroke.setAttribute('d', d);
-        L.fill.setAttribute('d', d);
-        L.echo.setAttribute('d', buildPath(L, t - 0.5)); // echo slightly delayed
-      }
-
-      // Rotate gradients
-      const ga = (t * 10) % 360;
-      ectoStrokeGrad.setAttribute('gradientTransform', `rotate(${ga}, 500, 500)`);
-      mesoStrokeGrad.setAttribute('gradientTransform', `rotate(${ga + 120}, 500, 500)`);
-      endoStrokeGrad.setAttribute('gradientTransform', `rotate(${ga + 240}, 500, 500)`);
-
-      // Morphogens
-      tickMorphogens(t);
-
-      // Cells
-      tickCells(dt);
-
-      // Text glow pulsing
-      const breathe = 1 + 0.004 * Math.sin(t * 1.3);
-      const pulse = 0.5 + 0.5 * Math.abs(Math.sin(BREATHE_FREQ * t));
-      const tt = `translate(500 500) scale(${breathe}) translate(-500 -500)`;
-      brandText.setAttribute('transform', tt);
-      textGlowWide.setAttribute('transform', tt);
-      textGlowMed.setAttribute('transform', tt);
-      textGlowWide.setAttribute('opacity', (0.10 + 0.08 * pulse).toFixed(3));
-      textGlowMed.setAttribute('opacity', (0.22 + 0.12 * pulse).toFixed(3));
-
-      // Pointer tilt
-      currentTilt += (targetTilt - currentTilt) * 0.08;
-      tiltLayer.style.transform = `rotate(${currentTilt}deg)`;
-
-      requestAnimationFrame(animate);
-    }
-
-    // Pointer tilt
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!mq.matches) {
-      window.addEventListener('pointermove', e => {
-        const r = scene.getBoundingClientRect();
-        const dx = (e.clientX - r.left) / r.width - 0.5;
-        targetTilt = Math.abs(dx) < 0.015 ? 0 : dx * 2;
-      }, { passive: true });
-      requestAnimationFrame(animate);
-    }
-  </script>
-  <noscript>
-    Epiblast AI
-  </noscript>
+    <nav class="tiles" aria-label="Products">
+      <a class="tile" href="https://github.com/epiblastai/homeobox" target="_blank" rel="noopener noreferrer">
+        <span class="tile-title">homeobox</span>
+        <p class="tile-desc">A database for multimodal biomedical atlases—gene expression, images, embeddings, and more. Query, version, and stream to PyTorch without forcing data into one shared feature space.</p>
+      </a>
+      <a class="tile" href="https://search.epiblast.ai" target="_blank" rel="noopener noreferrer">
+        <span class="tile-title">dataset search</span>
+        <p class="tile-desc">Semantic search across public biomedical datasets. Describe what you need in plain language and discover relevant expression, imaging, and clinical data across repositories.</p>
+      </a>
+    </nav>
+  </main>
 </body>
 </html>
